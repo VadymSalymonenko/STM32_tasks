@@ -1,5 +1,0 @@
-/home/pi/STM32_AzureRTOS_Project/build/CMakeFiles/rebuild_cache.dir
-/home/pi/STM32_AzureRTOS_Project/build/CMakeFiles/edit_cache.dir
-/home/pi/STM32_AzureRTOS_Project/build/CMakeFiles/cppcheck.dir
-/home/pi/STM32_AzureRTOS_Project/build/CMakeFiles/clang-format.dir
-/home/pi/STM32_AzureRTOS_Project/build/CMakeFiles/main.dir
