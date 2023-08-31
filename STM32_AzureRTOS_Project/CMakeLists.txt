@@ -4,8 +4,11 @@ cmake_minimum_required(VERSION 3.5)
 # Project name and language
 project(MyProject C)
 
-# Add executable target with source file
-add_executable(main src/main.c)
+# Specify the directories where the header files are
+include_directories(include)
+
+# Add executable target with source files
+add_executable(main src/main.c src/help_functions.c) # <-- Add help_functions.c here
 
 # Include clang-format as custom target
 find_program(CLANG_FORMAT "clang-format")
@@ -38,7 +41,6 @@ if(CPPCHECK_EXECUTABLE)
         ${CMAKE_SOURCE_DIR}/src/*.c
     )
 endif()
-
 
 # Output message
 message(STATUS "--------------------------------------------------")

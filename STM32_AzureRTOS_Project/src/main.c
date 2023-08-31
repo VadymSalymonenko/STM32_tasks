@@ -1,10 +1,10 @@
-#include <stdio.h>
+#include "help_functions.h"
 
 int main() {
-    int a = 5;
-    printf("--test--\n");
+    int result1 = multiply(5, 2);
+    int result2 = add(5, 3);
 
-    printf("Value of uninitialized variable: %d\n", a);
+    printf("--result--%d -- %d\n", result1, result2);
 
     return 0;
 }
