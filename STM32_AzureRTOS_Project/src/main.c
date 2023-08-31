@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main() {
-    int a;
+    int a = 5;
     printf("--test--\n");
 
     printf("Value of uninitialized variable: %d\n", a);
