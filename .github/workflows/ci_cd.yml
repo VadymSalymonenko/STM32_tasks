@@ -28,4 +28,5 @@ jobs:
       run: clang-format -i ${{github.workspace}}/STM32_AzureRTOS_Project/src/*.c
 
     - name: Run cppcheck
-      run: cppcheck ${{github.workspace}}/STM32_AzureRTOS_Project/src/*.c
+      run: cppcheck --enable=all --std=c11 --template=gcc --verbose --quiet --error-exitcode=1 ${{github.workspace}}/STM32_AzureRTOS_Project/src/*.c
+
