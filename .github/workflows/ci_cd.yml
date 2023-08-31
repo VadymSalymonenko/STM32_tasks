@@ -36,4 +36,4 @@ jobs:
     - name: Run ceedling tests
       run: |
         cd ${{github.workspace}}/STM32_AzureRTOS_Project/test
-        ceedling test:all
+        sudo ceedling test:all
