@@ -19,7 +19,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y gcc make clang-format cppcheck
-        gem install ceedling
+        sudo gem install ceedling
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/build -S ${{github.workspace}}/STM32_AzureRTOS_Project
@@ -36,4 +36,5 @@ jobs:
     - name: Run ceedling tests
       run: |
         cd ${{github.workspace}}/STM32_AzureRTOS_Project/test
-        sudo ceedling test:all
+        ceedling test:all
+
