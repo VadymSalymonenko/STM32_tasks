@@ -27,7 +27,7 @@ jobs:
 
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky/build -S ${{g>
+      run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky/build -S ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky
 
     - name: Build
       run: make -C ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky/build
@@ -36,10 +36,9 @@ jobs:
       run: clang-format -i ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky/*.c
 
     - name: Run cppcheck
-      run: cppcheck --enable=all --std=c11 --template=gcc --verbose --quiet --e>
+      run: cppcheck --enable=all --std=c11 --template=gcc --verbose --quiet --error-exitcode=1 ${{github.workspace}}/STM32_AzureRTOS_Project/src/*.c
 
     - name: Run ceedling tests
       run: |
         cd ${{github.workspace}}/STM32_AzureRTOS_Project
         ceedling test:all
-
