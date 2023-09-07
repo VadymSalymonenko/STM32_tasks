@@ -10,7 +10,7 @@ jobs:
       matrix:
         family: [F4, G0]
       fail-fast: false
-	  
+
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -20,12 +20,12 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y gcc make clang-format cppcheck
         sudo gem install ceedling
-		sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi
+        sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi
 
     - name: Create build directory for tests/fetch
       run: cmake -E make_directory ${{github.workspace}}/STM32_AzureRTOS_Project/tests/fetch/build
-	  
-	  
+
+
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky/build -S ${{g>
 
@@ -42,3 +42,4 @@ jobs:
       run: |
         cd ${{github.workspace}}/STM32_AzureRTOS_Project
         ceedling test:all
+
