@@ -1,16 +1,16 @@
 name: C/C++ CI
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [push, pull_request]
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        family: [F4, G0]
+      fail-fast: false
+	  
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
@@ -20,18 +20,23 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y gcc make clang-format cppcheck
         sudo gem install ceedling
+		sudo apt-get install gcc-arm-none-eabi binutils-arm-none-eabi
 
+    - name: Create build directory for tests/fetch
+      run: cmake -E make_directory ${{github.workspace}}/STM32_AzureRTOS_Project/tests/fetch/build
+	  
+	  
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/build -S ${{github.workspace}}/STM32_AzureRTOS_Project
+      run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky/build -S ${{g>
 
     - name: Build
-      run: make -C ${{github.workspace}}/STM32_AzureRTOS_Project/build
+      run: make -C ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky/build
 
     - name: Run clang-format
-      run: clang-format -i ${{github.workspace}}/STM32_AzureRTOS_Project/src/*.c
+      run: clang-format -i ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky/*.c
 
     - name: Run cppcheck
-      run: cppcheck --enable=all --std=c11 --template=gcc --verbose --quiet --error-exitcode=1 ${{github.workspace}}/STM32_AzureRTOS_Project/src/*.c
+      run: cppcheck --enable=all --std=c11 --template=gcc --verbose --quiet --e>
 
     - name: Run ceedling tests
       run: |
