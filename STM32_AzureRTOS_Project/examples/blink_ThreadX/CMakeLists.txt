@@ -1,19 +1,42 @@
 cmake_minimum_required(VERSION 3.16)
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/stm32_gcc.cmake)
 
+include(FetchContent)
+
+set(FETCHCONTENT_BASE_DIR ${PROJECT_SOURCE_DIR}/drivers)
+
+FetchContent_Declare(
+  ThreadX
+  GIT_REPOSITORY https://github.com/azure-rtos/threadx.git
+  GIT_TAG        master
+)
+
+FetchContent_GetProperties(ThreadX)
+if(NOT threadx_POPULATED)
+  FetchContent_Populate(ThreadX)
+
+  # Set the architecture and toolchain flags for ThreadX here
+  set(THREADX_ARCH "cortex_m0")  # or whatever is appropriate for your STM32 chip
+  set(THREADX_TOOLCHAIN "gnu")  # Assuming you're using the GNU ARM toolchain
+
+  add_subdirectory(${threadx_SOURCE_DIR} ${threadx_BINARY_DIR})
+endif()
+
+
+
 # Configure here which STM32 target(s) to build
 option(BLINKY_G0_EXAMPLE "Compile G0 example" ON)
 option(USE_CPP_FILE "Use the .cpp example file instead of the .c one" OFF)
 
-if(USE_CPP_FILE)
-    project(stm32-blinky C CXX ASM)
-    set(MAIN_SOURCE_FILE blinky.cpp)
-else()
-    project(stm32-blinky C ASM)
-    set(MAIN_SOURCE_FILE blinky.c)
-endif()
+project(stm32-blinky C ASM)
+set(MAIN_SOURCE_FILE main.c)
 
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
+
+# Include directories
+include_directories(
+    ${threadx_SOURCE_DIR}/common/inc
+)
 
 set(HAL_COMP_LIST RCC GPIO CORTEX)
 set(CMSIS_COMP_LIST "")
@@ -35,6 +58,7 @@ if(BLINKY_G0_EXAMPLE)
         HAL::STM32::G0::CORTEX
         CMSIS::STM32::G030F6
         STM32::NoSys
+        tx  # ThreadX library
     )
     stm32_print_size_of_target(stm32-blinky-g0)
 endif()

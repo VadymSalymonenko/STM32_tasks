@@ -10,7 +10,7 @@ void SysTick_Handler(void)
     HAL_IncTick();
 
     // 1 Hz blinking (1 second ON, 1 second OFF)
-    if ((HAL_GetTick() % 500) == 0)
+    if ((HAL_GetTick() % 50) == 0)
     {
         HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
     }
