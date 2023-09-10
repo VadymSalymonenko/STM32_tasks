@@ -1,12 +1,12 @@
 #include <stm32g0xx_hal.h>
-#include "tx_api.h"
+#include <tx_api.h>
 
 #define LED_PORT                GPIOA
 #define LED_PIN                 GPIO_PIN_3
 #define LED_PORT_CLK_ENABLE     __HAL_RCC_GPIOA_CLK_ENABLE
 
 TX_THREAD  my_thread;
-UINT8      my_thread_stack[1024];
+UINT      my_thread_stack[512];
 
 void initGPIO()
 {

@@ -1,43 +1,18 @@
 cmake_minimum_required(VERSION 3.16)
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/stm32_gcc.cmake)
 
-include(FetchContent)
-
-set(FETCHCONTENT_BASE_DIR ${PROJECT_SOURCE_DIR}/drivers)
-
-FetchContent_Declare(
-  ThreadX
-  GIT_REPOSITORY https://github.com/azure-rtos/threadx.git
-  GIT_TAG        master
-)
-
-FetchContent_GetProperties(ThreadX)
-if(NOT threadx_POPULATED)
-  FetchContent_Populate(ThreadX)
-
-  # Set the architecture and toolchain flags for ThreadX here
-  set(THREADX_ARCH "cortex_m0")  # or whatever is appropriate for your STM32 chip
-  set(THREADX_TOOLCHAIN "gnu")  # Assuming you're using the GNU ARM toolchain
-
-  add_subdirectory(${threadx_SOURCE_DIR} ${threadx_BINARY_DIR})
-endif()
+add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
 
-
-# Configure here which STM32 target(s) to build
 option(BLINKY_G0_EXAMPLE "Compile G0 example" ON)
 option(USE_CPP_FILE "Use the .cpp example file instead of the .c one" OFF)
 
 project(stm32-blinky C ASM)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
+
 set(MAIN_SOURCE_FILE main.c)
-
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-
-# Include directories
-include_directories(
-    ${threadx_SOURCE_DIR}/common/inc
-)
-
 set(HAL_COMP_LIST RCC GPIO CORTEX)
 set(CMSIS_COMP_LIST "")
 
@@ -49,19 +24,32 @@ endif()
 find_package(CMSIS COMPONENTS "${CMSIS_COMP_LIST}" REQUIRED)
 find_package(HAL COMPONENTS "${HAL_COMP_LIST}" REQUIRED)
 
-# STM32G030F6P6-Discovery (New Executable)
+set(THREADX_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/ThreadX/build/libthreadx.a")
+#set(THREADX_LIB_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/ThreadX/tx.a")
+
+
 if(BLINKY_G0_EXAMPLE)
-    add_executable(stm32-blinky-g0 ${MAIN_SOURCE_FILE} stm32g0xx_hal_conf.h)
+    add_executable(stm32-blinky-g0 main.c stm32g0xx_hal_conf.h)
+    
+    target_include_directories(stm32-blinky-g0 PRIVATE 
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/ThreadX/common/inc"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/ThreadX/ports/cortex_m0/gnu/inc"
+    )
+   # target_sources(stm32-blinky-g0
+    #    PRIVATE
+    #    ${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/ThreadX/ports/cortex_m0/gnu/example_build/sample_threadx.c
+    #)
     target_link_libraries(stm32-blinky-g0
         HAL::STM32::G0::RCC
         HAL::STM32::G0::GPIO
         HAL::STM32::G0::CORTEX
         CMSIS::STM32::G030F6
         STM32::NoSys
-        tx  # ThreadX library
+        ${THREADX_LIB_PATH}
     )
     stm32_print_size_of_target(stm32-blinky-g0)
 endif()
+
 
 # Custom Targets
 add_custom_target(compile
@@ -91,5 +79,4 @@ add_custom_target(custom_default
     COMMAND ${CMAKE_COMMAND} -E echo "please, choose option: compile, load_to_flash, or compile_load"
 )
 
-# Append the new default goal to the generated Makefile
 file(APPEND ${CMAKE_BINARY_DIR}/Makefile "\n.DEFAULT_GOAL := custom_default\n")
