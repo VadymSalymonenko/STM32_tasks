@@ -1,20 +1,18 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-
-# Paths
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/stm32_gcc.cmake)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
 
 # Project and languages
 project(stm32-blinky LANGUAGES C ASM)
-
-# Global compiler options
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
 # Options
 option(BLINKY_G0_EXAMPLE "Compile G0 example" ON)
-option(USE_CPP_FILE "Use the .cpp example file instead of the .c one" OFF)
+
+file(GLOB SOURCES "src/*.c")
+file(GLOB HEADERS "inc/*.h")
 
 # Set default components
 set(HAL_COMP_LIST RCC GPIO CORTEX)
@@ -35,12 +33,17 @@ set(THREADX_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/ThreadX")
 
 # Main executable
 if(BLINKY_G0_EXAMPLE)
-    add_executable(stm32-blinky-g0 main.c stm32g0xx_hal_conf.h tx_initialize_low_level.S)
+    add_executable(stm32-blinky-g0 ${SOURCES} tx_initialize_low_level.S)
 
+    target_include_directories(stm32-blinky-g0 PRIVATE inc)
+    
     target_sources(stm32-blinky-g0 PRIVATE
         /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.c
-    )
+        /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.c
+        /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_pwr_ex.c
 
+    )
+    
     target_include_directories(stm32-blinky-g0 PRIVATE
             ${THREADX_INCLUDE_DIR}/common/inc
             ${THREADX_INCLUDE_DIR}/ports/cortex_m0/gnu/inc

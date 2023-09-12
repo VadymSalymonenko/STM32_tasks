@@ -3,15 +3,12 @@ set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/stm32_gcc.cmake
 
 # Configure here which STM32 target(s) to build
 option(BLINKY_G0_EXAMPLE "Compile G0 example" ON)
-option(USE_CPP_FILE "Use the .cpp example file instead of the .c one" OFF)
 
-if(USE_CPP_FILE)
-    project(stm32-blinky C CXX ASM)
-    set(MAIN_SOURCE_FILE blinky.cpp)
-else()
-    project(stm32-blinky C ASM)
-    set(MAIN_SOURCE_FILE blinky.c)
-endif()
+project(stm32-blinky C ASM)
+
+# Collect all the .c and .h files from src and inc directories
+file(GLOB SOURCES "src/*.c")
+file(GLOB HEADERS "inc/*.h")
 
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
@@ -28,14 +25,17 @@ find_package(HAL COMPONENTS "${HAL_COMP_LIST}" REQUIRED)
 
 # STM32G030F6P6-Discovery (New Executable)
 if(BLINKY_G0_EXAMPLE)
-    add_executable(stm32-blinky-g0 ${MAIN_SOURCE_FILE} stm32g0xx_hal_conf.h)
+    add_executable(stm32-blinky-g0 ${SOURCES} )
     
+    target_include_directories(stm32-blinky-g0 PRIVATE inc)
+
     target_sources(stm32-blinky-g0 PRIVATE
         /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.c
         /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.c
+        /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_pwr_ex.c
 
     )
-    
+
     target_link_libraries(stm32-blinky-g0
         HAL::STM32::G0::RCC
         HAL::STM32::G0::GPIO
@@ -45,6 +45,7 @@ if(BLINKY_G0_EXAMPLE)
     )
     stm32_print_size_of_target(stm32-blinky-g0)
 endif()
+
 
 # Custom Targets
 add_custom_target(compile

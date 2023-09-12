@@ -140,6 +140,7 @@ ${CCRAM_SECTION}\n\
     . = . + _Min_Heap_Size;\n\
     . = . + _Min_Stack_Size;\n\
     . = ALIGN(8);\n\
+      __RAM_segment_used_end__ = .;\n\
   } >RAM\n\
 \n\
   /DISCARD/ :\n\
