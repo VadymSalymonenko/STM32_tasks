@@ -1,27 +1,25 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
-
-# Paths
 set(CMAKE_TOOLCHAIN_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../../cmake/stm32_gcc.cmake)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
 
 # Project and languages
-project(stm32-blinky LANGUAGES C ASM)
-
-# Global compiler options
+project(button_test LANGUAGES C ASM)
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
 # Options
-option(BLINKY_G0_EXAMPLE "Compile G0 example" ON)
-option(USE_CPP_FILE "Use the .cpp example file instead of the .c one" OFF)
+option(BUTTON_TEST_G0_EXAMPLE "Compile G0 example" ON)
+
+file(GLOB SOURCES "src/*.c")
+file(GLOB HEADERS "inc/*.h")
 
 # Set default components
 set(HAL_COMP_LIST RCC GPIO CORTEX)
 set(CMSIS_COMP_LIST "")
 
-# Configuration for BLINKY_G0_EXAMPLE
-if(BLINKY_G0_EXAMPLE)
+# Configuration for BUTTON_TEST_G0_EXAMPLE
+if(BUTTON_TEST_G0_EXAMPLE)
     list(APPEND CMSIS_COMP_LIST STM32G0)
     list(APPEND HAL_COMP_LIST STM32G0)
 endif()
@@ -34,15 +32,23 @@ find_package(HAL COMPONENTS ${HAL_COMP_LIST} REQUIRED)
 set(THREADX_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../drivers/ThreadX")
 
 # Main executable
-if(BLINKY_G0_EXAMPLE)
-    add_executable(stm32-blinky-g0 main.c stm32g0xx_hal_conf.h tx_initialize_low_level.S)
+if(BUTTON_TEST_G0_EXAMPLE)
+    add_executable(button_test-g0 ${SOURCES} tx_initialize_low_level.S)
 
-    target_include_directories(stm32-blinky-g0 PRIVATE
+    target_include_directories(button_test-g0 PRIVATE inc)
+    
+    target_sources(button_test-g0 PRIVATE
+        /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.c
+        /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.c
+        /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_pwr_ex.c
+    )
+    
+    target_include_directories(button_test-g0 PRIVATE
             ${THREADX_INCLUDE_DIR}/common/inc
             ${THREADX_INCLUDE_DIR}/ports/cortex_m0/gnu/inc
     )
 
-    target_link_libraries(stm32-blinky-g0
+    target_link_libraries(button_test-g0
             HAL::STM32::G0::RCC
             HAL::STM32::G0::GPIO
             HAL::STM32::G0::CORTEX
@@ -51,7 +57,7 @@ if(BLINKY_G0_EXAMPLE)
             ${THREADX_INCLUDE_DIR}/build/libthreadx.a
     )
 
-    stm32_print_size_of_target(stm32-blinky-g0)
+    stm32_print_size_of_target(button_test-g0)
 endif()
 
 # Custom targets
@@ -61,16 +67,16 @@ add_custom_target(compile
 )
 
 add_custom_target(load_to_flash
-        DEPENDS stm32-blinky-g0
-        COMMAND arm-none-eabi-objcopy -O binary stm32-blinky-g0.elf stm32-blinky-g0.bin
-        COMMAND st-flash write stm32-blinky-g0.bin 0x8000000
+        DEPENDS button_test-g0
+        COMMAND arm-none-eabi-objcopy -O binary button_test-g0.elf button_test-g0.bin
+        COMMAND st-flash write button_test-g0.bin 0x8000000
         COMMENT "Converting ELF to BIN and flashing to the board"
 )
 
 add_custom_target(compile_load
         COMMAND ${CMAKE_MAKE_PROGRAM}
-        COMMAND arm-none-eabi-objcopy -O binary stm32-blinky-g0.elf stm32-blinky-g0.bin
-        COMMAND st-flash write stm32-blinky-g0.bin 0x8000000
+        COMMAND arm-none-eabi-objcopy -O binary button_test-g0.elf button_test-g0.bin
+        COMMAND st-flash write button_test-g0.bin 0x8000000
         COMMENT "Compiling and flashing the board"
 )
 

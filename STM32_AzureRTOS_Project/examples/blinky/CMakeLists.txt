@@ -29,13 +29,6 @@ find_package(HAL COMPONENTS "${HAL_COMP_LIST}" REQUIRED)
 # STM32G030F6P6-Discovery (New Executable)
 if(BLINKY_G0_EXAMPLE)
     add_executable(stm32-blinky-g0 ${MAIN_SOURCE_FILE} stm32g0xx_hal_conf.h)
-    
-    target_sources(stm32-blinky-g0 PRIVATE
-        /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart.c
-        /opt/STM32CubeG0/Drivers/STM32G0xx_HAL_Driver/Src/stm32g0xx_hal_uart_ex.c
-
-    )
-    
     target_link_libraries(stm32-blinky-g0
         HAL::STM32::G0::RCC
         HAL::STM32::G0::GPIO
