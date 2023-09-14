@@ -40,11 +40,14 @@
 
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
+ADC_HandleTypeDef hadc1;
 
 /* USER CODE BEGIN PV */
+static void MX_ADC1_Init(void);
+
 void UART_Print(const char *str);
-TX_THREAD led_blink_thread;
-UCHAR                   led_blink_thread_stack[1024];
+TX_THREAD               pot_read_thread;
+UCHAR                   pot_read_thread_stack[1024];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -52,48 +55,56 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 
-
 /* USER CODE BEGIN PFP */
 void ulong_to_str(unsigned long n, char *str) {
     int i = 0, j = 0;
-    char temp[20]; // Тимчасовий масив для зберігання рядка
+    char temp[20]; 
 
-    // Перетворення числа в рядок
     do {
         temp[i++] = (n % 10) + '0';
         n = n / 10;
     } while (n);
 
-    // Перевертання рядка
     while (i--) {
         str[j++] = temp[i];
     }
     str[j] = '\0';
 }
 
-void led_blink_thread_entry(ULONG thread_input) {
-    char buttonState;  
-    char lastButtonState = GPIO_PIN_SET;  
+void pot_read_thread_entry(ULONG thread_input) {
+    uint32_t potValue;
+    char valueStr[10];
 
     while (1) {
-        buttonState = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0);
-       
-        if (buttonState == GPIO_PIN_RESET && lastButtonState == GPIO_PIN_SET) {
-            HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-            UART_Print("LED toggled due to button press\r\n");
-        }
+        #ifdef HAL_ADC_MODULE_ENABLED
+            HAL_ADC_Start(&hadc1);
+        
+            if (HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY) == HAL_OK) {
+                potValue = HAL_ADC_GetValue(&hadc1);
+                
+                ulong_to_str(potValue, valueStr);
+                
+                UART_Print("Potentiometer Value: ");
+                UART_Print(valueStr);
+                UART_Print("\r\n");
+            }
+        
+            HAL_ADC_Stop(&hadc1);
+        #else
+            UART_Print("ADC module not enabled. Please add it to your project.\r\n");
+        #endif
 
-        lastButtonState = buttonState;
-        //tx_thread_sleep(TX_TIMER_TICKS_PER_SECOND / 2);  
+        tx_thread_sleep(TX_TIMER_TICKS_PER_SECOND / 2);
     }
 }
 
 
+
 void tx_application_define(void *first_unused_memory)
 {
-    tx_thread_create(&led_blink_thread, "LED Blink Thread",
-                    led_blink_thread_entry, 0,
-                    led_blink_thread_stack, sizeof(led_blink_thread_stack),
+    tx_thread_create(&pot_read_thread, "Pot Read Thread",
+                    pot_read_thread_entry, 0,
+                    pot_read_thread_stack, sizeof(pot_read_thread_stack),
                     1, 1, TX_NO_TIME_SLICE, TX_AUTO_START);
 }
 
@@ -135,7 +146,11 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
-  
+  UART_Print("start 111\r\n");
+
+  MX_ADC1_Init();
+    UART_Print("start 222\r\n");
+
   /* USER CODE BEGIN 2 */
 
   tx_kernel_enter();
@@ -254,15 +269,51 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_PULLUP;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
 
 /* USER CODE BEGIN 4 */
+  
+
+void MX_ADC1_Init(void)
+{
+
+
+  ADC_ChannelConfTypeDef sConfig = {0};
+  hadc1.Instance = ADC1;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
+  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
+  hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
+  hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
+  hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
+  hadc1.Init.LowPowerAutoWait = DISABLE;
+  hadc1.Init.LowPowerAutoPowerOff = DISABLE;
+  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.DiscontinuousConvMode = DISABLE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
+  hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.DMAContinuousRequests = DISABLE;
+  hadc1.Init.Overrun = ADC_OVR_DATA_PRESERVED;
+  hadc1.Init.SamplingTimeCommon1 = ADC_SAMPLETIME_1CYCLE_5;
+  hadc1.Init.SamplingTimeCommon2 = ADC_SAMPLETIME_1CYCLE_5;
+  hadc1.Init.OversamplingMode = DISABLE;
+  hadc1.Init.TriggerFrequencyMode = ADC_TRIGGER_FREQ_HIGH;
+  if (HAL_ADC_Init(&hadc1) != HAL_OK)
+  {
+    UART_Print("ADC error\r\n");
+    Error_Handler();
+  }
+
+  sConfig.Channel = ADC_CHANNEL_7;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
+  sConfig.SamplingTime = ADC_SAMPLINGTIME_COMMON_1;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+}
 
 /* USER CODE END 4 */
 
