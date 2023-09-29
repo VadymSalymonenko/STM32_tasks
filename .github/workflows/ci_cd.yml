@@ -29,6 +29,19 @@ jobs:
     - name: Create build directory for tests/fetch
       run: cmake -E make_directory ${{github.workspace}}/STM32_AzureRTOS_Project/tests/fetch/build
 
+    - name: Initialize ThreadX Submodule
+      run: |
+        git submodule update --init --recursive
+
+    - name: Create ThreadX Build Directory
+      run: mkdir -p ${{github.workspace}}/STM32_AzureRTOS_Project/drivers/ThreadX/build
+
+    - name: Build ThreadX
+      run: |
+        cd ${{github.workspace}}/STM32_AzureRTOS_Project/drivers/ThreadX
+        cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m0.cmake -GNinja .
+        cmake --build ./build
+        
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/examples/MyGPIO_test/build -S ${{github.workspace}}/STM32_AzureRTOS_Project/examples/MyGPIO_test
       
