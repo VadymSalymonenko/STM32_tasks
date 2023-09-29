@@ -30,7 +30,7 @@ const PWM_Config valid_timers_configs[] = {
 static uint32_t timer_channel = 0;
 
 #ifndef TEST
-int MyGPIO_ValidateParams(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin) {
+int MyGPIO_ValidateParams(const GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin) {
 
     if (GPIOx == GPIOA) {
         uint16_t validPinsA = 0b0011100011111111;
@@ -346,8 +346,8 @@ int MX_TIM17_Init(TIM_HandleTypeDef *htim, uint32_t prescaler, uint32_t pulse,
 }
 #endif
 
-int validate_timer_config(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin,
-                          TIM_TypeDef *timerInstance, uint32_t channel) {
+int validate_timer_config(const GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin,
+                          const TIM_TypeDef *timerInstance, uint32_t channel) {
     for (int i = 0;
          i < sizeof(valid_timers_configs) / sizeof(valid_timers_configs[0]);
          ++i) {
