@@ -30,8 +30,8 @@ jobs:
       run: cmake -E make_directory ${{github.workspace}}/STM32_AzureRTOS_Project/tests/fetch/build
 
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky/build -S ${{github.workspace}}/STM32_AzureRTOS_Project/examples/blinky
-
+      run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/examples/MyGPIO_test/build -S ${{github.workspace}}/STM32_AzureRTOS_Project/examples/MyGPIO_test
+      
     - name: Build
       run: make -C ${{github.workspace}}/STM32_AzureRTOS_Project/examples/MyGPIO_test/build
 
