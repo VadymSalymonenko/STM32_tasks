@@ -30,8 +30,8 @@ typedef struct {
 #define true 1
 #define false 0
 
-int validate_timer_config(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin,
-                          TIM_TypeDef *timerInstance, uint32_t channel);
+int validate_timer_config(const GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin,
+                          const TIM_TypeDef *timerInstance, uint32_t channel);
 
 #ifndef TEST
 int MyGPIO_PWM_Init(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin,
