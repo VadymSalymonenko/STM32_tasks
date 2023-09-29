@@ -31,19 +31,19 @@ static uint32_t timer_channel = 0;
 
 #ifndef TEST
 int MyGPIO_ValidateParams(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin) {
-    uint16_t validPinsA = 0b0011100011111111;  // 0-7, 11-14
-    uint16_t validPinsB = 0b0000000111111111;  // 0-7, 8
-    uint16_t validPinsC = 0b1100000000000000;  // 14, 15
 
     if (GPIOx == GPIOA) {
+        uint16_t validPinsA = 0b0011100011111111;
         if ((GPIO_Pin & ~validPinsA) != 0) {
             return -1;
         }
     } else if (GPIOx == GPIOB) {
+        uint16_t validPinsB = 0b0000000111111111;
         if ((GPIO_Pin & ~validPinsB) != 0) {
             return -1;
         }
     } else if (GPIOx == GPIOC) {
+        uint16_t validPinsC = 0b1100000000000000;
         if ((GPIO_Pin & ~validPinsC) != 0) {
             return -1;
         }
@@ -53,6 +53,7 @@ int MyGPIO_ValidateParams(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin) {
 
     return 0;
 }
+
 
 int MyGPIO_Init(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, MyGPIOMode mode,
                 MyGPIOPull pull, MyGPIOSpeed speed) {

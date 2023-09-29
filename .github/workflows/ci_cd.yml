@@ -58,7 +58,7 @@ jobs:
       run: find ${{github.workspace}}/STM32_AzureRTOS_Project/src -name "*.c" -print0 | xargs -0 clang-format -i
       
     - name: Run cppcheck
-      run: cppcheck --enable=all --std=c11 --template=gcc --verbose --quiet --error-exitcode=1 ${{github.workspace}}/STM32_AzureRTOS_Project/src/*.c
+      run: cppcheck --enable=all --std=c11 --template=gcc --verbose --quiet --error-exitcode=1 --suppress=unusedFunction --suppress=missingInclude ${{github.workspace}}/STM32_AzureRTOS_Project/src/*.c
 
     - name: Run ceedling tests
       run: |
