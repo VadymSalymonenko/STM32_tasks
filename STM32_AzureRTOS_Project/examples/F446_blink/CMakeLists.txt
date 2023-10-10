@@ -33,6 +33,8 @@ target_include_directories(stm32-blinky-f4 PRIVATE inc)
 target_compile_options(stm32-blinky-f4 PRIVATE "-mfloat-abi=soft")
 
 target_sources(stm32-blinky-f4 PRIVATE
+    /opt/STM32CubeF4/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c
+    /opt/STM32CubeF4/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c
     /opt/STM32CubeF4/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c
 )
 

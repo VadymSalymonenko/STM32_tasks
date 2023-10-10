@@ -22,8 +22,8 @@ set(STM32_F4_CCRAM_SIZES
 stm32_util_create_family_targets(F4)
 
 target_compile_options(STM32::F4 INTERFACE 
-    -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+    -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=soft
 )
 target_link_options(STM32::F4 INTERFACE 
-    -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+    -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=soft
 )
