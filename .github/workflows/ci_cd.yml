@@ -43,7 +43,7 @@ jobs:
         cmake --build ./build
         
     - name: Configure CMake
-      run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/examples/clock/build -S ${{github.workspace}}/STM32_AzureRTOS_Project/examples/MyGPIO_test
+      run: cmake -B ${{github.workspace}}/STM32_AzureRTOS_Project/examples/clock/build -S ${{github.workspace}}/STM32_AzureRTOS_Project/examples/clock
       
     - name: Build
       run: make -C ${{github.workspace}}/STM32_AzureRTOS_Project/examples/clock/build
