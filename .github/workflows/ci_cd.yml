@@ -39,7 +39,7 @@ jobs:
     - name: Build ThreadX
       run: |
         cd ${{github.workspace}}/STM32_AzureRTOS_Project/drivers/ThreadX
-        cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m0.cmake -GNinja .
+        cmake -Bbuild -DCMAKE_TOOLCHAIN_FILE=./cmake/cortex_m4.cmake -GNinja .
         cmake --build ./build
         
     - name: Configure CMake
