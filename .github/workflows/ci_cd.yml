@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        family: [G0]
+        family: [F4]
       fail-fast: false
 
     steps:
